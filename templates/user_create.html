@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>
+            Sign Up
+        </title>
+
+    </head>
+    <body>
+        <div class="flex justify-center w-full">
+            <div class="w-[380px] m-20">
+                <div class="text-4xl font-bold">
+                    Todo Manager
+                </div>
+                <br><br>
+                <div class="text-2xl">
+                    Signup
+                </div>
+                <br>
+                <form method="post" class="tasks-form">
+                    {{form.as_p}}
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-500 block hover:bg-red-500 text-white rounded-xl p-3 w-full mt-4">
+                        Sign Up
+                    </button>
+                    <br>
+                    <a href="login" class="text-sm text-red-500 block text-center p-3">
+                        Login
+                    </a>
+                </form>
+            </div>
+        </div>
+        
+        
+    </body>
+            <style>
+            .helptext,li{
+                color: gray;
+                font-size: 0.75rem;
+                line-height: 1.25rem;
+            }
+            li{
+                list-style-type: disc;
+            }
+            label{
+                display: inline-block;
+                color: black;
+                margin-top: 1rem;
+            }
+            .errorlist{
+                padding: 25px 0px;
+            }
+            .errorlist li{
+                color: red;
+                font-size: 1rem;
+                padding:10px 0px ;
+                line-height: 1rem;
+            }
+        </style>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>
+            Login
+        </title>
+        <style>
+            .helptext,li{
+                color: gray;
+                font-size: 0.75rem;
+                line-height: 1.25rem;
+            }
+            li{
+                list-style-type: disc;
+            }
+            label{
+                display: inline-block;
+                color: black;
+                margin-top: 1rem;
+            }
+            .errorlist{
+                padding: 25px 0px;
+            }
+            .errorlist li{
+                color: red;
+                font-size: 1rem;
+                padding:10px 0px ;
+                line-height: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="flex justify-center w-full">
+            <div class="w-[380px] m-20">
+                <div class="text-4xl font-bold">
+                    Todo Manager
+                </div>
+                <br><br>
+                <div class="text-2xl">
+                    Login
+                </div>
+                <br>
+                <form method="post" class="tasks-form">
+                    {{ form.non_field_errors }}
+                    <p>
+                        {{ form.username.errors }}
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" autocomplete="username" maxlength="150" required id="username" class="p-3 bg-gray-200 rounded-xl block w-full my-2 text-black">
+                    </p>
+                    <p>
+                        {{ form.password.errors }}
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" autocomplete="current-password" required id="password" class="p-3 bg-gray-200 rounded-xl block w-full my-2 text-black">
+                    </p>
+                    {% csrf_token %}
+                    <button type="submit" class="bg-red-500 block hover:bg-red-600 text-white rounded-xl p-3 w-full mt-4">
+                        Login
+                    </button>
+                </form>
+                
+                <br>
+                <a href="signup" class="text-sm text-red-500 block text-center">
+                    New User ?
+                </a>
+            </div>
+        </div>
+    </body>
+</html>
