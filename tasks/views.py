@@ -135,13 +135,12 @@ class GenericTaskCreateView(CreateView):
 
 
 def add_priority(task_priority, username, completed):
-    print("add priority")
     model_a = Task.objects.filter(
-            priority=task_priority,
-            deleted=False,
-            completed=False,
-            user=username,
-        )
+        priority=task_priority,
+        deleted=False,
+        completed=False,
+        user=username,
+    )
     if model_a.exists() and completed == False:
         model = (
             Task.objects.select_for_update()
@@ -158,4 +157,6 @@ def add_priority(task_priority, username, completed):
                 update_list.append(model_obj)
             elif model_obj.priority > task_priority:
                 break
-        Task.objects.select_for_update().bulk_update(update_list, ["priority"], batch_size=100)
+        Task.objects.select_for_update().bulk_update(
+            update_list, ["priority"], batch_size=100
+        )
