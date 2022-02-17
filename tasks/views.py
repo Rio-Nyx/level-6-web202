@@ -115,15 +115,7 @@ class GenericTaskUpdateView(AuthorizedTaskManager, UpdateView):
         self.object = form.save()
         self.object.user = None
         self.object.save()
-
-        model_a = Task.objects.filter(
-            priority=self.object.priority,
-            deleted=False,
-            completed=False,
-            user=self.request.user,
-        )
-        if model_a.exists():
-            add_priority(self.object.priority, self.request.user)
+        add_priority(self.object.priority, self.request.user, self.object.completed)
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
@@ -136,25 +128,34 @@ class GenericTaskCreateView(CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        model_a = Task.objects.filter(
-            priority=self.object.priority,
-            deleted=False,
-            completed=False,
-            user=self.request.user,
-        )
-        if model_a.exists() and self.object.completed == False:
-            add_priority(self.object.priority, self.request.user)
+        add_priority(self.object.priority, self.request.user, self.object.completed)
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
 
-def add_priority(task_priority, username):
-    model = Task.objects.filter(
-        priority=task_priority, completed=False, deleted=False, user=username
-    )
-    if model.count() > 0:
-        add_priority(task_priority + 1, username)
-        model.update(priority=task_priority + 1)
-    else:
-        return
+def add_priority(task_priority, username, completed):
+    print("add priority")
+    model_a = Task.objects.filter(
+            priority=task_priority,
+            deleted=False,
+            completed=False,
+            user=username,
+        )
+    if model_a.exists() and completed == False:
+        model = (
+            Task.objects.select_for_update()
+            .filter(completed=False, deleted=False, user=username)
+            .order_by("priority")
+        )
+
+        update_list = []
+
+        for model_obj in model:
+            if model_obj.priority == task_priority:
+                model_obj.priority += 1
+                task_priority += 1
+                update_list.append(model_obj)
+            elif model_obj.priority > task_priority:
+                break
+        Task.objects.select_for_update().bulk_update(update_list, ["priority"], batch_size=100)
