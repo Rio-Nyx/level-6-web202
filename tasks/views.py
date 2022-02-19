@@ -114,10 +114,13 @@ class GenericTaskUpdateView(AuthorizedTaskManager, UpdateView):
     def form_valid(self, form):
         old_priority = Task.objects.get(id=form.instance.id).priority
         self.object = form.save()
+        # if priority changed do the cascading logic
+
         if self.object.priority != old_priority:
             self.object.user = None
             self.object.save()
             add_priority(self.object.priority, self.request.user, self.object.completed)
+
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
