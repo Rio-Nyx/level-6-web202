@@ -26,7 +26,7 @@ class StyledUserCreationForm(UserCreationForm):
         super(StyledUserCreationForm, self).__init__(*args, **kwargs)
 
         style = "text-black bg-gray-100 rounded-xl w-full my-1 p-3"
-        self.fields["user"].widget.attrs.update({"class": style})
+        self.fields["username"].widget.attrs.update({"class": style})
         self.fields["password1"].widget.attrs.update({"class": style})
         self.fields["password2"].widget.attrs.update({"class": style})
 
@@ -140,30 +140,21 @@ class GenericTaskCreateView(CreateView):
 
 
 def add_priority(task_priority, user, completed):
-    print("call in")
-    model_a = Task.objects.filter(
-        priority=task_priority,
-        deleted=False,
-        completed=False,
-        user=user,
+    model = (
+        Task.objects.select_for_update()
+        .filter(priority__gte=task_priority, completed=False, deleted=False, user=user)
+        .order_by("priority")
     )
-    if model_a.exists() and completed == False:
-        print("changed model")
-        model = (
-            Task.objects.select_for_update()
-            .filter(completed=False, deleted=False, user=user)
-            .order_by("priority")
-        )
 
-        update_list = []
+    update_list = []
 
-        for model_obj in model:
-            if model_obj.priority == task_priority:
-                model_obj.priority += 1
-                task_priority += 1
-                update_list.append(model_obj)
-            else:
-                break
-        Task.objects.select_for_update().bulk_update(
-            update_list, ["priority"], batch_size=100
-        )
+    for model_obj in model:
+        if model_obj.priority == task_priority:
+            model_obj.priority += 1
+            task_priority += 1
+            update_list.append(model_obj)
+        else:
+            break
+    Task.objects.select_for_update().bulk_update(
+        update_list, ["priority"], batch_size=100
+    )
